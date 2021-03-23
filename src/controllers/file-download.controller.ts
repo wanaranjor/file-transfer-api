@@ -12,7 +12,6 @@ import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
 import {UploadFilesKeys} from '../keys/upload-file-keys';
-import {Resource} from '../models';
 import {ResourceRepository} from '../repositories';
 const readdir = promisify(fs.readdir);
 
@@ -60,11 +59,25 @@ export class FileDownloadController {
    * @param recordId
    * @param response
    */
+  // @get('/files/{type}/{recordId}')
+  // @oas.response.file()
+  // async downloadFile(
+  //   @param.path.string('type') type: string,
+  //   @param.path.number('recordId') recordId: number,
+  //   @inject(RestBindings.Http.RESPONSE) response: Response,
+  // ) {
+  //   const folder = this.getFolderPathByType(type);
+  //   const fileName = await this.getFilenameById(type, recordId);
+  //   const file = this.validateFileName(folder, fileName);
+  //   response.download(file, fileName);
+  //   return response;
+  // }
+
   @get('/files/{type}/{recordId}')
   @oas.response.file()
   async downloadFile(
     @param.path.string('type') type: string,
-    @param.path.number('recordId') recordId: number,
+    @param.path.string('recordId') recordId: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
     const folder = this.getFolderPathByType(type);
@@ -73,6 +86,7 @@ export class FileDownloadController {
     response.download(file, fileName);
     return response;
   }
+
 
   /**
    * Get the folder when files are uploaded by type
@@ -83,6 +97,7 @@ export class FileDownloadController {
     switch (type) {
       case "telem":
         filePath = path.join(__dirname, UploadFilesKeys.TELEM_FILE_PATH);
+        console.log(filePath);
         break;
     }
     return filePath;
@@ -92,17 +107,36 @@ export class FileDownloadController {
    *
    * @param type
    */
-  private async getFilenameById(type: string, recordId: number) {
+  private async getFilenameById(type: string, recordId: string) {
     let fileName = '';
     switch (type) {
       case "telem":
         // eslint-disable-next-line no-case-declarations
-        const resource: Resource = await this.resourceRepository.findById(recordId);
-        fileName = resource.fileUrl ?? '';
+        // const resource: Resource = await this.resourceRepository.findById(recordId);
+        // const userEmailExits = await this.userRepository.findOne({where: {email: newUserRequest.email}})
+        // eslint-disable-next-line no-case-declarations
+        const resource = await this.resourceRepository.findOne({where: {fileUrl: recordId}});
+        if (resource) {
+          fileName = resource.fileUrl ?? '';
+          console.log(fileName);
+        }
         break;
     }
     return fileName;
   }
+
+  // private async getFilenameById(type: string, recordId: number) {
+  //   let fileName = '';
+  //   switch (type) {
+  //     case "telem":
+  //       // eslint-disable-next-line no-case-declarations
+  //       const resource: Resource = await this.resourceRepository.findById(recordId);
+  //       fileName = resource.fileUrl ?? '';
+  //       console.log(fileName);
+  //       break;
+  //   }
+  //   return fileName;
+  // }
 
   /**
    * Validate file names to prevent them goes beyond the designated directory
