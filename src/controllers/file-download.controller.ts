@@ -1,4 +1,5 @@
 import {inject} from '@loopback/core';
+import {repository} from '@loopback/repository';
 import {
   get,
   HttpErrors,
@@ -12,7 +13,7 @@ import path from 'path';
 import {promisify} from 'util';
 import {UploadFilesKeys} from '../keys/upload-file-keys';
 import {Resource} from '../models';
-
+import {ResourceRepository} from '../repositories';
 const readdir = promisify(fs.readdir);
 
 /**
@@ -20,7 +21,8 @@ const readdir = promisify(fs.readdir);
  */
 export class FileDownloadController {
 
-  constructor() { }
+  constructor(@repository(ResourceRepository)
+  private resourceRepository: ResourceRepository,) { }
 
   /**
    *
@@ -52,37 +54,25 @@ export class FileDownloadController {
     const files = await readdir(folderPath);
     return files;
   }
-
-  @get('/files/{filename}')
-  @oas.response.file()
-  downloadFile(
-    @param.path.string('filename') fileName: string,
-    @inject(RestBindings.Http.RESPONSE) response: Response,
-  ) {
-    const file = this.validateFileName(fileName);
-    response.download(file, fileName);
-    return response;
-  }
-
   /**
    *
    * @param type
    * @param recordId
    * @param response
    */
-  // @get('/files/{type}/{recordId}')
-  // @oas.response.file()
-  // async downloadFile(
-  //   @param.path.string('type') type: string,
-  //   @param.path.number('recordId') recordId: number,
-  //   @inject(RestBindings.Http.RESPONSE) response: Response,
-  // ) {
-  //   const folder = this.getFolderPathByType(type);
-  //   const fileName = await this.getFilenameById(type, recordId);
-  //   const file = this.validateFileName(folder, fileName);
-  //   response.download(file, fileName);
-  //   return response;
-  // }
+  @get('/files/{type}/{recordId}')
+  @oas.response.file()
+  async downloadFile(
+    @param.path.string('type') type: string,
+    @param.path.number('recordId') recordId: number,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ) {
+    const folder = this.getFolderPathByType(type);
+    const fileName = await this.getFilenameById(type, recordId);
+    const file = this.validateFileName(folder, fileName);
+    response.download(file, fileName);
+    return response;
+  }
 
   /**
    * Get the folder when files are uploaded by type
@@ -107,7 +97,7 @@ export class FileDownloadController {
     switch (type) {
       case "telem":
         // eslint-disable-next-line no-case-declarations
-        const resource: Resource = await this.ResourceRepository.findById(recordId);
+        const resource: Resource = await this.resourceRepository.findById(recordId);
         fileName = resource.fileUrl ?? '';
         break;
     }
