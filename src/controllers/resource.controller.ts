@@ -4,18 +4,22 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
+  del, get,
+  getModelSchemaRef, param,
+
+
+  patch, post,
+
+
+
+
   put,
-  del,
+
   requestBody,
-  response,
+  response
 } from '@loopback/rest';
 import {Resource} from '../models';
 import {ResourceRepository} from '../repositories';
@@ -23,8 +27,8 @@ import {ResourceRepository} from '../repositories';
 export class ResourceController {
   constructor(
     @repository(ResourceRepository)
-    public resourceRepository : ResourceRepository,
-  ) {}
+    public resourceRepository: ResourceRepository,
+  ) { }
 
   @post('/resources')
   @response(200, {
@@ -105,7 +109,7 @@ export class ResourceController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Resource, {exclude: 'where'}) filter?: FilterExcludingWhere<Resource>
   ): Promise<Resource> {
     return this.resourceRepository.findById(id, filter);
@@ -116,7 +120,7 @@ export class ResourceController {
     description: 'Resource PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +138,7 @@ export class ResourceController {
     description: 'Resource PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() resource: Resource,
   ): Promise<void> {
     await this.resourceRepository.replaceById(id, resource);
@@ -144,7 +148,7 @@ export class ResourceController {
   @response(204, {
     description: 'Resource DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.resourceRepository.deleteById(id);
   }
 }

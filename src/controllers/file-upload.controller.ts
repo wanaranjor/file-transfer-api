@@ -9,7 +9,7 @@ import {
 } from '@loopback/rest';
 import multer from 'multer';
 import path from 'path';
-import {UploadFilesKeys} from '../keys/upload-file-keys';
+import {UploadFilesKeys} from '../keys';
 
 /**
  * A controller to handle file uploads using multipart/form-data media type

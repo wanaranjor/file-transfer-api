@@ -11,7 +11,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
-import {UploadFilesKeys} from '../keys/upload-file-keys';
+import {UploadFilesKeys} from '../keys';
 import {ResourceRepository} from '../repositories';
 const readdir = promisify(fs.readdir);
 
