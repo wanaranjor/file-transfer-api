@@ -1,13 +1,15 @@
-import {Entity, model, property} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
+import {Area} from './area.model';
 
 @model()
 export class Resource extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
-    generated: true,
+    generated: false,
+    defaultFn: 'uuidv4',
   })
-  id?: number;
+  id: string;
 
   @property({
     type: 'string',
@@ -31,13 +33,16 @@ export class Resource extends Entity {
     type: 'string',
     required: true,
   })
-  area: string;
+  fileUrl: string;
 
   @property({
-    type: 'string',
+    type: 'date',
     required: true,
   })
-  fileUrl: string;
+  createdAt?: string;
+
+  @belongsTo(() => Area)
+  areaId: string;
 
   constructor(data?: Partial<Resource>) {
     super(data);
