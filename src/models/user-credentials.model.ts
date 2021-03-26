@@ -5,7 +5,8 @@
 
 import {Entity, model, property} from '@loopback/repository';
 
-@model({settings: {strict: false}})
+// Yes.Because {strict: false} mode is only supported by NoSQL databases.See #4042 and #4042(comment).
+@model({settings: {strict: true}})
 export class UserCredentials extends Entity {
   @property({
     type: 'string',

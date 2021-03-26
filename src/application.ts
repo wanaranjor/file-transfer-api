@@ -1,3 +1,5 @@
+import {AuthenticationComponent} from '@loopback/authentication';
+import {JWTAuthenticationComponent, MyUserService, UserServiceBindings} from '@loopback/authentication-jwt';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
@@ -9,6 +11,7 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import dotenv from 'dotenv';
 import path from 'path';
+import {PostgresqlDataSource} from './datasources';
 import {MySequence} from './sequence';
 dotenv.config()
 
@@ -43,5 +46,18 @@ export class FileTransferApiApplication extends BootMixin(
         nested: true,
       },
     };
+    // ------ ADD SNIPPET AT THE BOTTOM ---------
+    // Mount authentication system
+    this.component(AuthenticationComponent);
+    // Mount jwt component
+    this.component(JWTAuthenticationComponent);
+    // Bind datasource
+    this.dataSource(PostgresqlDataSource, UserServiceBindings.DATASOURCE_NAME);
+    // ------------- END OF SNIPPET -------------
+
+    //new
+    this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
   }
 }
+
+

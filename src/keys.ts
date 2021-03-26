@@ -1,10 +1,3 @@
-export namespace UploadFilesKeys {
-  export const TELEM_FILE_PATH = '../../uploads/telem/';
-  export const FILE_FIELDNAME = 'file';
-  export const MAX_FILE_SIZE = (1024 * 1024) * 10;
-  export const FILE_ACCEPTED_EXT: string[] = ['.png', '.jpg', '.pdf', '.odp'];
-}
-
 // Copyright IBM Corp. 2020. All Rights Reserved.
 // Node module: @loopback/authentication-jwt
 // This file is licensed under the MIT License.
@@ -103,3 +96,16 @@ export const FILE_UPLOAD_SERVICE = BindingKey.create<FileUploadHandler>(
  * Binding key for the storage directory
  */
 export const STORAGE_DIRECTORY = BindingKey.create<string>('storage.directory');
+
+
+
+/**
+ * Binding key for the upload directory
+ */
+export namespace UploadFilesKeys {
+  export const TELEM_FILE_PATH = '../../uploads/telem/';
+  export const COEST_FILE_PATH = '../../uploads/COEST/';
+  export const FILE_FIELDNAME = 'file';
+  export const MAX_FILE_SIZE = (1024 * 1024) * 10;
+  export const FILE_ACCEPTED_EXT: string[] = ['.png', '.jpg', '.pdf', '.odp'];
+}

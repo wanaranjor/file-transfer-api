@@ -25,6 +25,18 @@ export class User extends Entity {
   })
   email: string;
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  responsable: string;
+
+  @property({
+    type: 'date',
+    required: true,
+  })
+  createdAt?: string;
+
   @hasOne(() => UserCredentials)
   userCredentials: UserCredentials;
 

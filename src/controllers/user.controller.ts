@@ -37,8 +37,7 @@ const CredentialsSchema: SchemaObject = {
   required: ['email', 'password'],
   properties: {
     email: {
-      type: 'string',
-      minLength: 8,
+      type: 'string'
     },
     password: {
       type: 'string',
@@ -97,7 +96,7 @@ export class UserController {
     return {token};
   }
 
-  @post('/signup', {
+  @post('/users', {
     responses: {
       '200': {
         description: 'User',
@@ -124,10 +123,14 @@ export class UserController {
     newUserRequest: NewUserRequest,
   ): Promise<User> {
 
-    const emailExits = await this.userRepository.findOne({where: {email: newUserRequest.email}})
+    const emailExits = await this.userRepository.findOne({where: {email: newUserRequest.email}});
+    const userNameExits = await this.userRepository.findOne({where: {username: newUserRequest.username}})
 
     if (emailExits) {
-      throw new HttpErrors[403]("email already exists.");
+      throw new HttpErrors[403]("Email already exists.");
+    }
+    if (userNameExits) {
+      throw new HttpErrors[403]("Username already exists.");
     }
     const password = await hash(newUserRequest.password, await genSalt());
     const savedUser = await this.userRepository.create(

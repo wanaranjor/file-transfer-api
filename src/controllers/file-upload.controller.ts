@@ -48,6 +48,37 @@ export class FileUploadController {
     return res;
   }
 
+  @post('/coest', {
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+        description: 'Telem Upload File',
+      },
+    },
+  })
+  async coestFileUpload(
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+    @requestBody.file() request: Request,
+  ): Promise<object | false> {
+    const filePath = path.join(__dirname, UploadFilesKeys.COEST_FILE_PATH);
+    const fieldname = UploadFilesKeys.FILE_FIELDNAME;
+    const acceptedExt = UploadFilesKeys.FILE_ACCEPTED_EXT;
+    const res = await this.storeFileToPath(filePath, fieldname, request, response, acceptedExt);
+    if (res) {
+      const filename = response.req?.file.filename;
+      if (filename) {
+        return {filename: filename};
+      }
+    }
+    return res;
+  }
+
   private getMulterStorageConfig(storePath: string) {
     const storage = multer.diskStorage({
       destination: function (req, file, cb) {
