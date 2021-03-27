@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -20,7 +21,7 @@ import {
   User
 } from '../models';
 import {AreaRepository} from '../repositories';
-
+@authenticate('jwt')
 export class AreaUserController {
   constructor(
     @repository(AreaRepository) protected areaRepository: AreaRepository,

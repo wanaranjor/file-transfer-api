@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   repository
 } from '@loopback/repository';
@@ -10,6 +11,7 @@ import {
 } from '../models';
 import {UserRepository} from '../repositories';
 
+@authenticate('jwt')
 export class UserAreaController {
   constructor(
     @repository(UserRepository)

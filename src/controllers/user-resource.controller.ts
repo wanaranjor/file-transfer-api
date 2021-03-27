@@ -17,21 +17,20 @@ import {
   requestBody
 } from '@loopback/rest';
 import {
-  Area,
-  Resource
+  Resource, User
 } from '../models';
-import {AreaRepository} from '../repositories';
+import {UserRepository} from '../repositories';
 
 @authenticate('jwt')
-export class AreaResourceController {
+export class UserResourceController {
   constructor(
-    @repository(AreaRepository) protected areaRepository: AreaRepository,
+    @repository(UserRepository) protected userRepository: UserRepository,
   ) { }
 
-  @get('/areas/{id}/resources', {
+  @get('/users/{id}/resources', {
     responses: {
       '200': {
-        description: 'Array of Area has many Resource',
+        description: 'Array of User has many Resource',
         content: {
           'application/json': {
             schema: {type: 'array', items: getModelSchemaRef(Resource)},
@@ -44,38 +43,38 @@ export class AreaResourceController {
     @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Resource>,
   ): Promise<Resource[]> {
-    return this.areaRepository.resources(id).find(filter);
+    return this.userRepository.resources(id).find(filter);
   }
 
-  @post('/areas/{id}/resources', {
+  @post('/users/{id}/resources', {
     responses: {
       '200': {
-        description: 'Area model instance',
+        description: 'User model instance',
         content: {'application/json': {schema: getModelSchemaRef(Resource)}},
       },
     },
   })
   async create(
-    @param.path.string('id') id: typeof Area.prototype.id,
+    @param.path.string('id') id: typeof User.prototype.id,
     @requestBody({
       content: {
         'application/json': {
           schema: getModelSchemaRef(Resource, {
-            title: 'NewResourceInArea',
+            title: 'NewResourceInUser',
             exclude: ['id'],
-            optional: ['areaId']
+            optional: ['userId']
           }),
         },
       },
     }) resource: Omit<Resource, 'id'>,
   ): Promise<Resource> {
-    return this.areaRepository.resources(id).create(resource);
+    return this.userRepository.resources(id).create(resource);
   }
 
-  @patch('/areas/{id}/resources', {
+  @patch('/users/{id}/resources', {
     responses: {
       '200': {
-        description: 'Area.Resource PATCH success count',
+        description: 'User.Resource PATCH success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -92,13 +91,13 @@ export class AreaResourceController {
     resource: Partial<Resource>,
     @param.query.object('where', getWhereSchemaFor(Resource)) where?: Where<Resource>,
   ): Promise<Count> {
-    return this.areaRepository.resources(id).patch(resource, where);
+    return this.userRepository.resources(id).patch(resource, where);
   }
 
-  @del('/areas/{id}/resources', {
+  @del('/users/{id}/resources', {
     responses: {
       '200': {
-        description: 'Area.Resource DELETE success count',
+        description: 'User.Resource DELETE success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -107,6 +106,6 @@ export class AreaResourceController {
     @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Resource)) where?: Where<Resource>,
   ): Promise<Count> {
-    return this.areaRepository.resources(id).delete(where);
+    return this.userRepository.resources(id).delete(where);
   }
 }

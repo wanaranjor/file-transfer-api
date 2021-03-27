@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {
   HttpErrors,
@@ -14,10 +15,11 @@ import {UploadFilesKeys} from '../keys';
 /**
  * A controller to handle file uploads using multipart/form-data media type
  */
+@authenticate('jwt')
 export class FileUploadController {
   constructor() { }
 
-  @post('/telem-file', {
+  @post('/telem', {
     responses: {
       200: {
         content: {

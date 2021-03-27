@@ -7,32 +7,33 @@ import {
   getModelSchemaRef, param
 } from '@loopback/rest';
 import {
-  Area, Resource
+  Resource,
+  User
 } from '../models';
 import {ResourceRepository} from '../repositories';
 
 @authenticate('jwt')
-export class ResourceAreaController {
+export class ResourceUserController {
   constructor(
     @repository(ResourceRepository)
     public resourceRepository: ResourceRepository,
   ) { }
 
-  @get('/resources/{id}/area', {
+  @get('/resources/{id}/user', {
     responses: {
       '200': {
-        description: 'Area belonging to Resource',
+        description: 'User belonging to Resource',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Area)},
+            schema: {type: 'array', items: getModelSchemaRef(User)},
           },
         },
       },
     },
   })
-  async getArea(
+  async getUser(
     @param.path.string('id') id: typeof Resource.prototype.id,
-  ): Promise<Area> {
-    return this.resourceRepository.area(id);
+  ): Promise<User> {
+    return this.resourceRepository.user(id);
   }
 }

@@ -1,5 +1,6 @@
-import {belongsTo, Entity, hasOne, model, property} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {Area} from './area.model';
+import {Resource} from './resource.model';
 import {UserCredentials} from './user-credentials.model';
 
 @model()
@@ -32,11 +33,19 @@ export class User extends Entity {
   responsable: string;
 
   @property({
+    type: 'string',
+    required: true,
+  })
+  role: string;
+
+  @property({
     type: 'date',
     required: true,
   })
   createdAt?: string;
 
+  @hasMany(() => Resource)
+  resources: Resource[];
   @hasOne(() => UserCredentials)
   userCredentials: UserCredentials;
 

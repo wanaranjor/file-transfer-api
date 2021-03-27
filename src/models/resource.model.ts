@@ -1,5 +1,6 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {Area} from './area.model';
+import {User} from './user.model';
 
 @model()
 export class Resource extends Entity {
@@ -43,6 +44,9 @@ export class Resource extends Entity {
 
   @belongsTo(() => Area)
   areaId: string;
+
+  @belongsTo(() => User)
+  userId: string;
 
   constructor(data?: Partial<Resource>) {
     super(data);

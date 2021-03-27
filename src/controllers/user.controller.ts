@@ -96,6 +96,7 @@ export class UserController {
     return {token};
   }
 
+  @authenticate('jwt')
   @post('/users', {
     responses: {
       '200': {

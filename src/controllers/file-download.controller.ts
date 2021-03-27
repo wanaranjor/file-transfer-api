@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {
@@ -18,6 +19,7 @@ const readdir = promisify(fs.readdir);
 /**
  * A controller to handle file downloads using multipart/form-data media type
  */
+
 export class FileDownloadController {
 
   constructor(@repository(ResourceRepository)
@@ -28,6 +30,7 @@ export class FileDownloadController {
    * @param type
    * @param id
    */
+  @authenticate('jwt')
   @get('/files/{type}', {
     responses: {
       200: {

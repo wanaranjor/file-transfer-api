@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -17,6 +18,7 @@ import {
 import {Resource} from '../models';
 import {ResourceRepository} from '../repositories';
 
+@authenticate('jwt')
 export class ResourceController {
   constructor(
     @repository(ResourceRepository)
