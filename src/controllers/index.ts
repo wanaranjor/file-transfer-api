@@ -10,3 +10,4 @@ export * from './user-area.controller';
 export * from './user-resource.controller';
 export * from './user.controller';
 
+export * from './profile.controller';

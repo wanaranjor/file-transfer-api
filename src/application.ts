@@ -31,8 +31,11 @@ export class FileTransferApiApplication extends BootMixin(
     this.static('/', path.join(__dirname, '../public'));
 
     // Customize @loopback/rest-explorer configuration here
+    // this.configure(RestExplorerBindings.COMPONENT).to({
+    //   path: '/explorer',
+    // });
     this.configure(RestExplorerBindings.COMPONENT).to({
-      path: '/explorer',
+      path: '/openapi/ui',
     });
     this.component(RestExplorerComponent);
 
