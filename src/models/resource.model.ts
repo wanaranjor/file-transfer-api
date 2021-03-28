@@ -37,6 +37,11 @@ export class Resource extends Entity {
   fileUrl: string;
 
   @property({
+    type: 'string',
+  })
+  message: string;
+
+  @property({
     type: 'date',
     required: true,
   })

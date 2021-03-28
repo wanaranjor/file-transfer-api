@@ -13,24 +13,29 @@ import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
 import {UploadFilesKeys} from '../keys';
-import {ResourceRepository} from '../repositories';
+import {AreaRepository, ResourceRepository, UserRepository} from '../repositories';
+
 const readdir = promisify(fs.readdir);
 
 /**
  * A controller to handle file downloads using multipart/form-data media type
  */
-
+@authenticate('jwt')
 export class FileDownloadController {
 
   constructor(@repository(ResourceRepository)
-  private resourceRepository: ResourceRepository,) { }
+  private resourceRepository: ResourceRepository,
+    @repository(AreaRepository)
+    private areaRepository: AreaRepository,
+    @repository(UserRepository)
+    private userRepository: UserRepository) { }
 
   /**
    *
    * @param type
    * @param id
    */
-  @authenticate('jwt')
+
   @get('/files/{type}', {
     responses: {
       200: {
@@ -52,7 +57,6 @@ export class FileDownloadController {
   async listFiles(
     @param.path.string('type') type: string,) {
     const folderPath = this.getFolderPathByType(type);
-    console.log(folderPath)
     const files = await readdir(folderPath);
     return files;
   }
@@ -62,19 +66,6 @@ export class FileDownloadController {
    * @param recordId
    * @param response
    */
-  // @get('/files/{type}/{recordId}')
-  // @oas.response.file()
-  // async downloadFile(
-  //   @param.path.string('type') type: string,
-  //   @param.path.number('recordId') recordId: number,
-  //   @inject(RestBindings.Http.RESPONSE) response: Response,
-  // ) {
-  //   const folder = this.getFolderPathByType(type);
-  //   const fileName = await this.getFilenameById(type, recordId);
-  //   const file = this.validateFileName(folder, fileName);
-  //   response.download(file, fileName);
-  //   return response;
-  // }
 
   @get('/files/{type}/{recordId}')
   @oas.response.file()
@@ -90,19 +81,13 @@ export class FileDownloadController {
     return response;
   }
 
-
   /**
    * Get the folder when files are uploaded by type
    * @param type
    */
   private getFolderPathByType(type: string) {
     let filePath = '';
-    switch (type) {
-      case "telem":
-        filePath = path.join(__dirname, UploadFilesKeys.TELEM_FILE_PATH);
-        console.log(filePath);
-        break;
-    }
+    filePath = path.join(__dirname, UploadFilesKeys.FOLDER_UPLOADS + type);
     return filePath;
   }
 
@@ -112,35 +97,22 @@ export class FileDownloadController {
    */
   private async getFilenameById(type: string, recordId: string) {
     let fileName = '';
-    switch (type) {
-      case "telem":
-        // eslint-disable-next-line no-case-declarations
-        // const resource: Resource = await this.resourceRepository.findById(recordId);
-        // const userEmailExits = await this.userRepository.findOne({where: {email: newUserRequest.email}})
-        // eslint-disable-next-line no-case-declarations
-        const resource = await this.resourceRepository.findOne({where: {fileUrl: recordId}});
-        if (resource) {
-          fileName = resource.fileUrl ?? '';
-          console.log(fileName);
-        }
-        break;
+    const resource = await this.resourceRepository.findOne({
+      where: {fileUrl: recordId},
+      include: ['area']
+    });
+    if (resource) {
+      const user = await this.userRepository.findById(resource.userId);
+      const area = await this.areaRepository.findById(resource.areaId);
+      // Verifico si el usuario pertenece al area de donde pertenece el recurso
+      if (area.id === user.areaId) {
+        fileName = resource.fileUrl ?? '';
+      } else {
+        throw new HttpErrors[400](`Unable to download file: /${type}/${resource.fileUrl}`);
+      }
     }
     return fileName;
   }
-
-  // private async getFilenameById(type: string, recordId: number) {
-  //   let fileName = '';
-  //   switch (type) {
-  //     case "telem":
-  //       // eslint-disable-next-line no-case-declarations
-  //       const resource: Resource = await this.resourceRepository.findById(recordId);
-  //       fileName = resource.fileUrl ?? '';
-  //       console.log(fileName);
-  //       break;
-  //   }
-  //   return fileName;
-  // }
-
   /**
    * Validate file names to prevent them goes beyond the designated directory
    * @param fileName - File name

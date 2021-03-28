@@ -2,6 +2,7 @@ import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {
   HttpErrors,
+  param,
   post,
   Request,
   requestBody,
@@ -19,7 +20,7 @@ import {UploadFilesKeys} from '../keys';
 export class FileUploadController {
   constructor() { }
 
-  @post('/telem', {
+  @post('/upload/{folder}', {
     responses: {
       200: {
         content: {
@@ -36,42 +37,12 @@ export class FileUploadController {
   async telemFileUpload(
     @inject(RestBindings.Http.RESPONSE) response: Response,
     @requestBody.file() request: Request,
+    @param.path.string('folder') folder: string,
   ): Promise<object | false> {
-    const telemFilePath = path.join(__dirname, UploadFilesKeys.TELEM_FILE_PATH);
+    const telemFilePath = path.join(__dirname, UploadFilesKeys.FOLDER_UPLOADS + folder);
     const fieldname = UploadFilesKeys.FILE_FIELDNAME;
     const acceptedExt = UploadFilesKeys.FILE_ACCEPTED_EXT;
     const res = await this.storeFileToPath(telemFilePath, fieldname, request, response, acceptedExt);
-    if (res) {
-      const filename = response.req?.file.filename;
-      if (filename) {
-        return {filename: filename};
-      }
-    }
-    return res;
-  }
-
-  @post('/coest', {
-    responses: {
-      200: {
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-            },
-          },
-        },
-        description: 'Telem Upload File',
-      },
-    },
-  })
-  async coestFileUpload(
-    @inject(RestBindings.Http.RESPONSE) response: Response,
-    @requestBody.file() request: Request,
-  ): Promise<object | false> {
-    const filePath = path.join(__dirname, UploadFilesKeys.COEST_FILE_PATH);
-    const fieldname = UploadFilesKeys.FILE_FIELDNAME;
-    const acceptedExt = UploadFilesKeys.FILE_ACCEPTED_EXT;
-    const res = await this.storeFileToPath(filePath, fieldname, request, response, acceptedExt);
     if (res) {
       const filename = response.req?.file.filename;
       if (filename) {
